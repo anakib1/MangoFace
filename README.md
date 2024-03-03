@@ -42,6 +42,8 @@ python inference.py data -output_file o.csv
 
 <h2>Model zoo</h2>
 
+At total our project supports 17 models.
+
 **Clustering models**
 - KMeans 
 - DBScan 
@@ -52,8 +54,18 @@ python inference.py data -output_file o.csv
 - VIT
 - ResNet
 - ResNeXT
+
+**As part of DeepFace wrapper we support the following models**:
+
 - VGG
 - OpenFace
+- Facenet
+- Facenet512
+- DeepFace
+- DeepID
+- ArcFace
+- Dlib
+- SFace
 
 **Coming soon (after deadline :sad_face:)**
 - GCN Clustering

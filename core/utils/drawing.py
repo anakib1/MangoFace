@@ -58,7 +58,7 @@ class DrawingUtility:
         if max_images is not None:
             embeddings, filenames = embeddings[:max_images], filenames[:max_images]
 
-        projections = TSNE(n_components=2, perplexity=25, learning_rate=10).fit_transform(torch.stack(embeddings))
+        projections = TSNE(n_components=2, perplexity=25, learning_rate=10).fit_transform(embeddings)
 
         tx, ty = projections[:, 0], projections[:, 1]
         tx = (tx - np.min(tx)) / (np.max(tx) - np.min(tx))
@@ -92,4 +92,27 @@ class DrawingUtility:
             avg_image = np.array(avg_image).mean(axis=0).astype(np.int8)
 
             ax[i // n_cols][i % n_cols].imshow(avg_image)
-            plt.axis('off')
+            ax[i // n_cols][i % n_cols].axis('off')
+
+    def draw_best(self):
+        num_clusters = len(self.cluster_to_id)
+        n_cols = (num_clusters + 3) // 4
+
+        fig, ax = plt.subplots(4, n_cols)
+        for i, k in enumerate(self.cluster_to_id.keys()):
+            best_img = None
+            bst_dist = np.inf
+            for img_id in self.cluster_to_id[k]:
+                embed1 = self.embeddings[img_id]
+                distance = np.inf
+                for other_img in self.cluster_to_id[k]:
+                    embed2 = self.embeddings[other_img]
+                    distance = max(distance,
+                                   np.dot(embed1, embed2) / np.linalg.norm(embed1) / np.linalg.norm(embed2))
+
+                if distance < bst_dist:
+                    bst_dist = distance
+                    best_img = img_id
+
+            ax[i // n_cols][i % n_cols].imshow(Image.open(self.filenames[best_img]))
+            ax[i // n_cols][i % n_cols].axis('off')
