@@ -9,7 +9,7 @@ import numpy as np
 
 class DrawingUtility:
 
-    def __init__(self, embeddings:torch.Tensor, predictions: torch.Tensor, filenames: List[str]):
+    def __init__(self, embeddings: torch.Tensor, predictions: torch.Tensor, filenames: List[str]):
         """
         Initializes visualisation module.
         :param embeddings:
@@ -69,7 +69,7 @@ class DrawingUtility:
         max_dim = 100
 
         full_image = Image.new('RGBA', (width, height))
-        for img, x, y in zip(names, tx, ty):
+        for img, x, y in zip(filenames, tx, ty):
             tile = Image.open(img)
             rs = max(1, tile.width / max_dim, tile.height / max_dim)
             tile = tile.resize((int(tile.width / rs), int(tile.height / rs)), Image.ANTIALIAS)
@@ -78,3 +78,18 @@ class DrawingUtility:
         plt.figure(figsize=(16, 12))
         plt.imshow(full_image)
         plt.axis('off')
+
+    def draw_average(self):
+        num_clusters = len(self.cluster_to_id)
+        n_cols = (num_clusters + 3) // 4
+
+        fig, ax = plt.subplots(4, n_cols)
+        for i, k in enumerate(self.cluster_to_id.keys()):
+            avg_image = []
+            for img_id in self.cluster_to_id[k]:
+                avg_image.append(np.array(Image.open(self.filenames[img_id]).resize((124, 124))))
+
+            avg_image = np.array(avg_image).mean(axis=0).astype(np.int8)
+
+            ax[i // n_cols][i % n_cols].imshow(avg_image)
+            plt.axis('off')
